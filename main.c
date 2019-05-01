@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
+#include <math.h>
 
 #include <windows.h>
 #include <olectl.h>
@@ -20,8 +21,10 @@
 #define LINE 1
 #define RECTANGLE 2
 #define ELLIPSE 3
-#define TEXT 4
+#define TEXTFRAME 4
 #define DONTDRAW 5
+#define PI 3.141592653589793
+#define INITSIZE 10
 
 //This is the toggle rectangle frame of an element.
 typedef struct _toggle_point
@@ -30,9 +33,10 @@ typedef struct _toggle_point
 	double y;
 	int select;
 }toggle_point;
+
 typedef struct _toggle_rect
 {
-	toggle_point* points[8];//There should be 8 toggle points.
+	toggle_point points[9];//There should be 8 toggle points.
 	int isDisplay;//Whether the toggle frame should be displayed.
 }toggle_rect;
 
@@ -44,162 +48,421 @@ typedef struct _point
 	double y;
 }point;
 
+typedef struct _pointp
+{
+	point *array;
+	int index;
+	int size;
+}pointp;
+
 typedef struct _line
 {
-	int id;
 	double x;
 	double y;
 	double dx;
 	double dy;
-	point* p;
+	pointp p;
 	toggle_rect frame;
 }line;
 
 typedef struct _rectangle
 {
-	int id;
 	double x;
 	double y;
 	double l;
 	double h;
-	point* p;
+	pointp p;
 	toggle_rect frame;
 }rectangle;
 
 typedef struct _ellipse
 {
-	int id;
+	double x;
+	double y;
 	double rx;
 	double ry;
-	double start;
-	double sweep;
-	point* p;
+	pointp p;
 	toggle_rect frame;
 }ellipse;
 
 typedef struct _element
 {
+	int index;
 	int id;
 	void* pointer;
 }element;
 
+typedef struct _elementp
+{
+	element *array;
+	int size;
+	int index;
+}elementp;
+
 int POINTSIZE = 40;
 int PENSIZE = 3;
+char *PENCOLOR = "Gray";
+int isEraze;
 int isDrag;
 int isDraw;
 int isSelect;
+int isntNew;
 int isMove;
 int isToggle;
+double omx, omy;
+double tx, ty;
 
 //Core of this CAD program. Represents the element to be moved, toggled, deleted, or kind of element to be drawn.
-element elemt = {DONTDRAW, NULL};
+element elemt = { 0, DONTDRAW, NULL };
+elementp allelements = { NULL, 0, 0 };
 
-
+void StartPolygon(void);
+void AddSegment(int x0, int y0, int x1, int y1);
+void DisplayPolygon(void);
+void AddPolygonPoint(int x, int y);
+double InchesY(int y);
+int ScaleX(double x);
+int ScaleY(double y);
 
 void KeyboardEventProcess(int key, int event);
 void MouseEventProcess(int x, int y, int key, int event);
-void CharEventProcess(int ch);
+void CharEventProcess(char ch);
 int CheckArea();//Return whether there's an elemtect in this area. Select this elemtect if there is. Change isSelect and isMove status.
 int CheckToggle();//Return whether toggle point is touched. Select this toggle point if it is. Change isToggle status.
 
-void Move(element elemt, double mx, double my);//Move element around.
-void MoveLine(line moved, double mx, double my);
-void MoveRectangle(rectangle moved, double mx, double my);
-void MoveEllipse(ellipse moved, double mx, double my);
+void Move(double mx, double my);//Move element around.
+void MoveLine(line *pmoved, double mx, double my);
+void MoveRectangle(rectangle *pmoved, double mx, double my);
+void MoveEllipse(ellipse *pmoved, double mx, double my);
 
-void Toggle(element elemt, double mx, double my);//Toggle the size of selected element.
-void ToggleLine(line toggled, double mx, double my);
-void ToggleRectangle(rectangle toggled, double mx, double my);
-void ToggleEllipse(ellipse toggled, double mx, double my);
+void Toggle(double mx, double my);//Toggle the size of selected element.
+void ToggleLine(line *ptoggled, double mx, double my);
+void ToggleRectangle(rectangle *ptoggled, double mx, double my);
+void ToggleEllipse(ellipse *ptoggled, double mx, double my);
 
-void Add(element elemt, double mx, double my);//When adding an element, consider using Toggle() functions.
-void AddLine(line added, double mx, double my);
-void AddRectangle(rectangle added, double mx, double my);
-void AddEllipse(ellipse added, double mx, double my);
+void Add(double mx, double my);
+void AddPoint(pointp *pp, double xi, double yi);
+void AddLine(double mx, double my);
+void AddRectangle(double mx, double my);
+void AddEllipse(double mx, double my);
+void RenderEllipse(ellipse *pelli);
 
-void Delete(element elemt);//Delete selected element.
-void DeleteLine(line deleted);
-void DeleteRectangle(rectangle deleted);
-void DeleteEllipse(ellipse deleted);
+void Delete();//Delete selected element.
 
 void DrawEverything();
+void EraseEverything();
 
 void Main()
 {
 	InitGraphics();
 
-	SetPenColor("Gray");
+	SetPenColor(PENCOLOR);
 	SetPenSize(PENSIZE);
 	SetPointSize(POINTSIZE);
 
 	registerKeyboardEvent(KeyboardEventProcess);
 	registerMouseEvent(MouseEventProcess);
 	registerCharEvent(CharEventProcess);
+
+	allelements.array = (element*)malloc(sizeof(element) * INITSIZE);
+	allelements.size = INITSIZE;
 }
 
-void Move(element elemt, double mx, double my)
+int CheckArea()
+{
+	isSelect = 0;
+	return 0;
+}
+
+int CheckToggle()
+{
+	isToggle = 0;
+	return 0;
+}
+
+void AddLine(double mx, double my)
+{
+
+}
+void AddRectangle(double mx, double my)
+{
+
+}
+void MoveLine(line *pmoved, double mx, double my)
+{
+
+}
+void MoveRectangle(rectangle *pmoved, double mx, double my)
+{
+
+}
+void MoveEllipse(ellipse *pmoved, double mx, double my)
+{
+
+}
+void ToggleLine(line *ptoggled, double mx, double my)
+{
+
+}
+void ToggleRectangle(rectangle *ptoggled, double mx, double my)
+{
+
+}
+
+void EraseEverything()
+{
+	isEraze = 1;
+	DrawEverything();
+	isEraze = 0;
+}
+
+void DrawEverything()
+{
+	if (isEraze)
+		SetPenColor("White");
+	else
+		SetPenColor(PENCOLOR);
+	for (int i = 0; i < allelements.index; i++)
+	{
+		StartPolygon();
+		switch (allelements.array[i].id)
+		{
+		case LINE:
+		case RECTANGLE:
+		case ELLIPSE:
+			for (int j = 0; j < ((ellipse*)allelements.array[i].pointer)->p.index; j++)
+			{
+				int scalex, scaley;
+				scalex = ScaleX(((ellipse*)allelements.array[i].pointer)->p.array[j].x);
+				scaley = ScaleY(((ellipse*)allelements.array[i].pointer)->p.array[j].y);
+				AddPolygonPoint(scalex, scaley);
+			}
+		}
+		DisplayPolygon();
+	}
+}
+
+void Move(double mx, double my)
 {
 	switch (elemt.id)
 	{
 	case LINE:
-		MoveLine(*(line*)elemt.pointer, mx, my);
+		MoveLine((line*)elemt.pointer, mx, my);
 		break;
 	case RECTANGLE:
-		MoveRectangle(*(rectangle*)elemt.pointer, mx, my);
+		MoveRectangle((rectangle*)elemt.pointer, mx, my);
 		break;
 	case ELLIPSE:
-		MoveEllipse(*(ellipse*)elemt.pointer, mx, my);
+		MoveEllipse((ellipse*)elemt.pointer, mx, my);
 		break;
 	}
 }
 
-void Toggle(element elemt, double mx, double my)
+void Toggle(double mx, double my)
 {
 	switch (elemt.id)
 	{
 	case LINE:
-		ToggleLine(*(line*)elemt.pointer, mx, my);
+		ToggleLine((line*)elemt.pointer, mx, my);
 		break;
 	case RECTANGLE:
-		ToggleRectangle(*(rectangle*)elemt.pointer, mx, my);
+		ToggleRectangle((rectangle*)elemt.pointer, mx, my);
 		break;
 	case ELLIPSE:
-		ToggleEllipse(*(ellipse*)elemt.pointer, mx, my);
+		ToggleEllipse((ellipse*)elemt.pointer, mx, my);
 		break;
 	}
 }
 
-void Add(element elemt, double mx, double my)
+void ToggleEllipse(ellipse *pelli, double mx, double my)
 {
+	int selected = 0;
+	for (int i = 0; i < 3; i++)
+	{
+		for (int j = 0; j < 3; j++)
+		{
+			if (pelli->frame.points[3 * i + j].select)
+				selected = 3 * i + j;
+		}
+	}
+
+	double newx, newy;
+	switch (selected)
+	{
+	//Toggle upper-left
+	case 0:
+		tx = pelli->frame.points[8].x;
+		ty = pelli->frame.points[8].y;
+		newx = mx;
+		newy = my;
+		break;
+	
+	//Toggle left
+	case 1:
+		tx = pelli->frame.points[8].x;
+		ty = pelli->frame.points[8].y;
+		newx = mx;
+		newy = ty + pelli->ry * 2;
+		break;
+
+	//Toggle lower-right
+	case 2:
+		tx = pelli->frame.points[6].x;
+		ty = pelli->frame.points[6].y;
+		newx = mx;
+		newy = my;
+		break;
+
+	//Toggle up
+	case 3:
+		tx = pelli->frame.points[2].x;
+		ty = pelli->frame.points[2].y;
+		newx = tx + pelli->rx * 2;
+		newy = my;
+		break;
+
+	//Do nothing
+	case 4:
+		break;
+
+	//Toggle down
+	case 5:
+		tx = pelli->frame.points[0].x;
+		ty = pelli->frame.points[0].y;
+		newx = tx + pelli->rx * 2;
+		newy = my;
+		break;
+
+	//Toggle upper-right
+	case 6:
+		tx = pelli->frame.points[2].x;
+		ty = pelli->frame.points[2].y;
+		newx = mx;
+		newy = my;
+		break;
+
+	//Toggle right
+	case 7:
+		tx = pelli->frame.points[2].x;
+		ty = pelli->frame.points[2].y;
+		newx = mx;
+		newy = ty + pelli->ry * 2;
+		break;
+
+	//Toggle lower-right
+	case 8:
+		tx = pelli->frame.points[0].x;
+		ty = pelli->frame.points[0].y;
+		newx = mx;
+		newy = my;
+		break;
+	}
+
+	AddEllipse(newx, newy);
+	Delete();
+}
+
+void Add(double mx, double my)
+{
+	if (isntNew)//If item exists, toggle it.
+	{
+		Toggle(mx, my);
+		return;
+	}
+	if (allelements.index + 10 >= allelements.size)
+	{
+		realloc(allelements.array, allelements.size);
+		allelements.size *= 2;
+	}
 	switch (elemt.id)
 	{
 	case LINE:
-		AddLine(*(line*)elemt.pointer, mx, my);
+		AddLine(mx, my);
 		break;
 	case RECTANGLE:
-		AddRectangle(*(rectangle*)elemt.pointer, mx, my);
+		AddRectangle(mx, my);
 		break;
 	case ELLIPSE:
-		AddEllipse(*(ellipse*)elemt.pointer, mx, my);
+		AddEllipse(mx, my);
 		break;
 	}
 }
 
-void Delete(element elemt)
+void AddPoint(pointp *pp, double xi, double yi)
 {
-	switch (elemt.id)
+	if (pp->index+10 >= pp->size)
 	{
-	case LINE:
-		DeleteLine(*(line*)elemt.pointer);
-		break;
-	case RECTANGLE:
-		DeleteRectangle(*(rectangle*)elemt.pointer);
-		break;
-	case ELLIPSE:
-		DeleteEllipse(*(ellipse*)elemt.pointer);
-		break;
+		realloc(pp->array, pp->size * 2);
+		pp->size *= 2;
+	}
+	pp->array[pp->index].x = xi;
+	pp->array[pp->index].y = yi;
+	pp->index++;
+}
+
+void AddEllipse(double mx, double my)
+{
+	ellipse *pelli = (ellipse *)malloc(sizeof(ellipse));
+	elemt.id = ELLIPSE;
+	elemt.pointer = pelli;
+	isSelect = 1;
+	allelements.array[allelements.index].id = ELLIPSE;
+	allelements.array[allelements.index].pointer = pelli;
+	allelements.array[allelements.index].index = allelements.index++;
+	allelements.index++;
+
+	pelli->rx = (mx - tx) / 2;
+	pelli->ry = (my - ty) / 2;
+	pelli->x = tx + pelli->rx;
+	pelli->y = ty + pelli->ry;
+	pelli->p.array = (point*)malloc(sizeof(point) * 200);
+	pelli->p.size = 200;
+	pelli->p.index = 0;
+	RenderEllipse(pelli);
+
+	/*
+	Counting frames as
+	0	3	5
+	1	4	6
+	2	5	8
+	*/
+	for (int i = 0; i < 3; i++)
+	{
+		for (int j = 0; j < 3; j++)
+		{
+			pelli->frame.isDisplay = 0;
+			pelli->frame.points[3 * i + j].x = tx + i * (mx - omx) / 2;
+			pelli->frame.points[3 * i + j].y = ty + j * (my - omy) / 2;
+			pelli->frame.points[3 * i + j].select = 0;
+		}
+	}
+	pelli->frame.points[8].select = 1;//For toggle
+}
+
+void RenderEllipse(ellipse *pelli)
+{
+	double dt, xi = pelli->x, yi = pelli->y;
+
+	dt = atan2(InchesY(5), (pelli->rx >= pelli->ry) ? pelli->rx : pelli->ry);
+	for (double t = 0.0; t < 2 * PI; t += dt)
+	{
+		if (t > 2 * PI - dt / 2)
+			t = 2 * PI;
+		xi = pelli->x + pelli->rx * cos(t);
+		yi = pelli->y + pelli->ry * sin(t);
+		AddPoint(&pelli->p, xi, yi);
 	}
 }
+
+void Delete()
+{
+	memcpy(&allelements.array[elemt.index], &allelements.array[elemt.index + 1], sizeof(allelements.array[0])*(allelements.index - elemt.index));
+	free(&elemt);
+	for (int i = elemt.index; i < allelements.index;i++)
+		allelements.array[i].index--;
+	allelements.index--;
+}
+
 
 void KeyboardEventProcess(int key, int event)
 {
@@ -209,18 +472,24 @@ void KeyboardEventProcess(int key, int event)
 		switch (key)
 		{
 		case VK_F1:
-			elemt.id= LINE;
+			elemt.id = LINE;
+			break;
 		case VK_F2:
 			elemt.id = RECTANGLE;
+			break;
 		case VK_F3:
 			elemt.id = ELLIPSE;
+			break;
 		case VK_F4:
-			elemt.id = TEXT;
+			elemt.id = TEXTFRAME;
+			break;
 		case VK_F5:
 			elemt.id = DONTDRAW;
+			break;
 		case DELETE:
-			Delete(elemt);
-		//More keyborad function to be added.
+			Delete();
+			break;
+			//More keyborad function to be added.
 		}
 	}
 }
@@ -229,6 +498,8 @@ void MouseEventProcess(int x, int y, int key, int event)
 {
 	double mx = ScaleXInches(x);
 	double my = ScaleYInches(y);
+	tx = omx = mx;
+	ty = omy = my;
 	switch (key)
 	{
 	case LEFT_BUTTON:
@@ -255,28 +526,38 @@ void MouseEventProcess(int x, int y, int key, int event)
 
 		case MOUSEMOVE:
 			if (isDrag)
-				if (isDraw)
-					Add(elemt, mx, my);
-				else if (isMove)
-					Move(elemt, mx, my);
-				else if (isToggle)
-					Toggle(elemt, mx, my);
+			{
+				//EraseEverything();
+				//if (isDraw && !isMove && !isToggle)
+				{
+					Add(mx, my);
+					isntNew++;
+				}
+				//else if (isMove)
+				//	Move(mx, my);
+				//else if (isToggle)
+				//	Toggle(mx, my);
+			}
 			DrawEverything();
+			tx = omx = mx;
+			ty = omy = my;
 			break;
 
 		case BUTTON_UP:
 			isDrag = 0;
 			isDraw = 0;
+			isntNew = 0;
 			break;
 
 			//Consider adding hand(mouse)-drawing function.
 		}
 	case RIGHT_BUTTON:
+		break;
 		//Consider changing pensize.
 	}
 }
 
-void CharEventProcess(int ch)
+void CharEventProcess(char ch)
 {
-	//Consider using already written Text program(in homework4).
+	//Consider using already written TEXTFRAME program(in homework4).
 }
