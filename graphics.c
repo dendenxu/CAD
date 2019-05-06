@@ -282,10 +282,10 @@ static void SetLineBB(RECT *rp, double x, double y, double dx, double dy);
 static void SetArcBB(RECT *rp, double xc, double yc,
                      double rx, double ry, double start, double sweep);
 void SetTextBB(RECT *rp, double x, double y, string text);
-void StartPolygon(void);
-void AddSegment(int x0, int y0, int x1, int y1);
-void DisplayPolygon(void);
-void AddPolygonPoint(int x, int y);
+static void StartPolygon(void);
+static void AddSegment(int x0, int y0, int x1, int y1);
+static void DisplayPolygon(void);
+static void AddPolygonPoint(int x, int y);
 static void InitColors(void);
 static int FindColorName(string name);
 
@@ -296,8 +296,8 @@ static int RectHeight(RECT *rp);
 static void SetRectFromSize(RECT *rp, int x, int y, int width, int height);
 static double Radians(double degrees);
 static int Round(double x);
-double InchesX(int x);
-double InchesY(int y);
+static double InchesX(int x);
+static double InchesY(int y);
 static int PixelsX(double x);
 static int PixelsY(double y);
 int ScaleX(double x);
@@ -1619,7 +1619,7 @@ void SetTextBB(RECT *rp, double x, double y, string text)
  * after calling DisplayPolygon.
  */
 
-void StartPolygon(void)
+static void StartPolygon(void)
 {
     polygonPoints = NewArray(PStartSize, POINT);
     polygonSize = PStartSize;
@@ -1627,13 +1627,13 @@ void StartPolygon(void)
     SetRect(&polygonBounds, LargeInt, LargeInt, 0, 0);
 }
 
-void AddSegment(int x0, int y0, int x1, int y1)
+static void AddSegment(int x0, int y0, int x1, int y1)
 {
     if (nPolygonPoints == 0) AddPolygonPoint(x0, y0);
     AddPolygonPoint(x1, y1);
 }
 
-void DisplayPolygon(void)
+static void DisplayPolygon(void)
 {
     int px;
     HBRUSH brush, oldBrush;
@@ -1654,7 +1654,7 @@ void DisplayPolygon(void)
         Error("Internal error: Can't load brush");
     }
     oldBrush = (HBRUSH) SelectObject(osdc, brush);
-    Polyline(osdc, polygonPoints, nPolygonPoints);
+    Polygon(osdc, polygonPoints, nPolygonPoints);
     (void) SelectObject(osdc, oldPen);
     if (oldBrush != NULL) (void) SelectObject(osdc, oldBrush);
     FreeBlock(polygonPoints);
@@ -1670,7 +1670,7 @@ void DisplayPolygon(void)
  * interface.
  */
 
-void AddPolygonPoint(int x, int y)
+static void AddPolygonPoint(int x, int y)
 {
     POINT *newPolygon;
     int i;
@@ -1847,12 +1847,12 @@ static int Round(double x)
  * vertical directions, the coordinates are treated separately.
  */
 
-double InchesX(int x)
+static double InchesX(int x)
 {
     return ((double) x / xResolution);
 }
 
-double InchesY(int y)
+static double InchesY(int y)
 {
     return ((double) y / yResolution);
 }
