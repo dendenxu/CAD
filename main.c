@@ -243,6 +243,7 @@ int CheckArea(double mx, double my)
 			break;
 		}
 	}
+	frame.isDisplay = 0;
 
 	for (int i = 0; i < allelements.index; i++)
 	{
