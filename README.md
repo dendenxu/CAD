@@ -40,3 +40,20 @@
    - Or `move` it around within the window. (A `toggle box` should appear.)
    - With your `toggle box ` on the screen, toggle the ellipse selected on the screen.
    - Want to close the window? Hit `Alt + f4`.
+
+
+
+## My Thoughts
+
+You think it works smoothly, don't you?
+
+Hhhhh.
+
+The actual source **IS COMPLETELY A MESS**.
+
+### A MESS!!
+
+Nothing more to say.
+
+Feeling dead already.
+
