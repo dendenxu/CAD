@@ -207,19 +207,8 @@ void DrawFrame()
 
 void DrawEverything()
 {
-	//RECT r;
-	//r.left = 0;
-	//r.top = 0;
-	//r.right = pixelWidth;
-	//r.bottom = pixelHeight;
-	//InvalidateRect(graphicsWindow, &r, FALSE);
-	//if (isErase)
-	//	SetPenColor("White");
-	//else
-	//	SetPenColor(PENCOLOR);
 	for (int i = 0; i < allelements.index; i++)
 	{
-		//StartPolygon();
 		switch (allelements.array[i].id)
 		{
 		case LINE:
@@ -232,20 +221,10 @@ void DrawEverything()
 			y = pelli->y;
 			rx = pelli->rx;
 			ry = pelli->ry;
-			//MovePen(x + rx, y);
 			DisplayArc(x, y, rx, ry, 0, 360);
 			break;
 		}
-
-		/*	for (int j = 0; j < ((ellipse*)allelements.array[i].pointer)->p.index; j++)
-			{
-				int scalex, scaley;
-				scalex = ScaleX(((ellipse*)allelements.array[i].pointer)->p.array[j].x);
-				scaley = ScaleY(((ellipse*)allelements.array[i].pointer)->p.array[j].y);
-				AddPolygonPoint(scalex, scaley);
-			}*/
 		}
-		//DisplayPolygon();
 	}
 	if (frame.isDisplay)
 		DrawFrame();
@@ -582,39 +561,23 @@ void Add(double mx, double my)
 	}
 }
 
-//void AddPoint(pointp *pp, double xi, double yi)
-//{
-//	if (pp->index+10 >= pp->size)
-//	{
-//		realloc(pp->array, pp->size * 2);
-//		pp->size *= 2;
-//	}
-//	pp->array[pp->index].x = xi;
-//	pp->array[pp->index].y = yi;
-//	pp->index++;
-//}
-
 void AddEllipse(double mx, double my)
 {
 	isSelect = 1;
 
 	ellipse *pelli;
 	pelli = (ellipse *)malloc(sizeof(ellipse));
-	elemt.id = ELLIPSE;
-	elemt.pointer = pelli;
-	elemt.index = allelements.index;
 	allelements.array[allelements.index].id = ELLIPSE;
 	allelements.array[allelements.index].pointer = pelli;
-	allelements.array[allelements.index].index = allelements.index++;
+	allelements.array[allelements.index].index = allelements.index;
+	memcpy(&slect, &allelements.array[allelements.index], sizeof(element));
+	memcpy(&elemt, &slect, sizeof(element));
+	allelements.index++;
 
 	pelli->rx = fabs((mx - tx) / 2);
 	pelli->ry = fabs((my - ty) / 2);
 	pelli->x = tx + (mx - tx) / 2;
 	pelli->y = ty + (my - ty) / 2;
-	//pelli->p.array = (point*)malloc(sizeof(point) * 200);
-	//pelli->p.size = 200;
-	//pelli->p.index = 0;
-	//RenderEllipse(pelli);
 
 	/*
 	Counting frames as
@@ -637,20 +600,6 @@ void AddEllipse(double mx, double my)
 
 }
 
-//void RenderEllipse(ellipse *pelli)
-//{
-//	double dt, xi = pelli->x, yi = pelli->y;
-//
-//	dt = atan2(InchesY(5), (pelli->rx >= pelli->ry) ? pelli->rx : pelli->ry);
-//	for (double t = 0.0; t < 2 * PI; t += dt)
-//	{
-//		if (t > 2 * PI - dt / 2)
-//			t = 2 * PI;
-//		xi = pelli->x + pelli->rx * cos(t);
-//		yi = pelli->y + pelli->ry * sin(t);
-//		AddPoint(&pelli->p, xi, yi);
-//	}
-//}
 
 void Delete()
 {
@@ -762,9 +711,6 @@ void MouseEventProcess(int x, int y, int key, int event)
 		if (isDrag)
 		{
 			BitBlt(osdc, 0, 0, pixelWidth, pixelHeight, osdc, 0, 0, WHITENESS);//If a white background is desired, this line can be deleted.
-			//isErase = 1;
-			//DrawEverything();
-			//isErase = 0;
 			if (isDraw && !isMove && !isToggle)
 			{
 				Add(mx, my);
