@@ -46,8 +46,8 @@
  * DefaultFont     -- Font that serves as the "Default" font
  */
 
-#define DesiredWidth       24.0
-#define DesiredHeight      14.0
+#define DesiredWidth       16.0
+#define DesiredHeight      9.0
 #define DefaultSize       12
 #define MaxTitle          75
 #define MaxFontName       50
@@ -270,7 +270,7 @@ static void CheckEvents(void);
 static void DoUpdate(void);
 void DisplayClear(void);
 static void PrepareToDraw(void);
-static void DisplayLine(double x, double y, double dx, double dy);
+void DisplayLine(double x, double y, double dx, double dy);
 void DisplayArc(double xc, double yc, double rx, double ry,
                        double start, double sweep);
 static void RenderArc(double x, double y, double rx, double ry,
@@ -1279,7 +1279,7 @@ static void PrepareToDraw(void)
  * region instead.
  */
 
-static void DisplayLine(double x, double y, double dx, double dy)
+void DisplayLine(double x, double y, double dx, double dy)
 {
     int x0, y0, x1, y1;
     RECT r;
@@ -1290,7 +1290,11 @@ static void DisplayLine(double x, double y, double dx, double dy)
     x1 = ScaleX(x + dx);
     y1 = ScaleY(y + dy);
     if (regionState == NoRegion) {
-        SetLineBB(&r, x-1, y-1, dx+2, dy+2);
+        //SetLineBB(&r, x-1, y-1, dx+2, dy+2);
+		r.left = 0;
+		r.top = 0;
+		r.right = pixelWidth;
+		r.bottom = pixelHeight;
         InvalidateRect(graphicsWindow, &r, FALSE);
         MoveToEx(osdc, x0, y0, NULL);
         LineTo(osdc, x1, y1);
