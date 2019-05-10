@@ -32,13 +32,13 @@ typedef struct _toggle_point
 	int select;
 	double x;
 	double y;
-}toggle_point;
+} toggle_point;
 
 typedef struct _toggle_rect
 {
-	toggle_point points[9];//There should be 8 toggle points.
-	int isDisplay;//Whether the toggle frame should be displayed.
-}toggle_rect;
+	toggle_point points[9]; //There should be 8 toggle points.
+	int isDisplay;			//Whether the toggle frame should be displayed.
+} toggle_rect;
 
 typedef struct _line
 {
@@ -47,7 +47,7 @@ typedef struct _line
 	double dx;
 	double dy;
 	toggle_rect frame;
-}line;
+} line;
 
 typedef struct _rectangle
 {
@@ -56,7 +56,7 @@ typedef struct _rectangle
 	double dx;
 	double dy;
 	toggle_rect frame;
-}rectangle;
+} rectangle;
 
 typedef struct _ellipse
 {
@@ -65,21 +65,21 @@ typedef struct _ellipse
 	double rx;
 	double ry;
 	toggle_rect frame;
-}ellipse;
+} ellipse;
 
 typedef struct _element
 {
 	int index;
 	int id;
-	void* pointer;
-}element;
+	void *pointer;
+} element;
 
 typedef struct _elementp
 {
 	element *array;
 	int size;
 	int index;
-}elementp;
+} elementp;
 
 extern HDC osdc;
 extern int pixelWidth;
@@ -99,12 +99,11 @@ double omx, omy;
 double tx, ty;
 
 //Core of this CAD program. Represents the element to be moved, toggled, deleted, or kind of element to be drawn.
-element elemt = { 0, DONTDRAW, NULL };
-elementp allelements = { NULL, 0, 0 };
+element elemt = {0, DONTDRAW, NULL};
+elementp allelements = {NULL, 0, 0};
 //toggle_rect frame;
-toggle_rect drawnFrame;//This is completely something used to beautify the code in DrawEverything()
+toggle_rect drawnFrame; //This is completely something used to beautify the code in DrawEverything()
 int Toolbox;
-
 
 void DisplayArc(double xc, double yc, double rx, double ry, double start, double sweep);
 void DisplayLine(double x, double y, double dx, double dy);
@@ -117,15 +116,15 @@ int ScaleY(double y);
 void KeyboardEventProcess(int key, int event);
 void MouseEventProcess(int x, int y, int key, int event);
 void CharEventProcess(char ch);
-int CheckArea(double mx, double my);//Return whether there's an elemtect in this area. Select this elemtect if there is. Change isSelect and isMove status.
-int CheckToggle(double mx, double my);//Return whether toggle point is touched. Select this toggle point if it is. Change isToggle status.
+int CheckArea(double mx, double my);   //Return whether there's an elemtect in this area. Select this elemtect if there is. Change isSelect and isMove status.
+int CheckToggle(double mx, double my); //Return whether toggle point is touched. Select this toggle point if it is. Change isToggle status.
 
-void Move(double mx, double my);//Move element around.
+void Move(double mx, double my); //Move element around.
 void MoveLine(line *pmoved, double mx, double my);
 void MoveRectangle(line *pmoved, double mx, double my);
 void MoveEllipse(ellipse *pmoved, double mx, double my);
 
-void Toggle(double mx, double my);//Toggle the size of selected element.
+void Toggle(double mx, double my); //Toggle the size of selected element.
 void ToggleLine(line *ptoggled, double mx, double my);
 void ToggleRectangle(line *ptoggled, double mx, double my);
 void ToggleEllipse(ellipse *ptoggled, double mx, double my);
@@ -135,7 +134,7 @@ void AddLine(double mx, double my);
 void AddRectangle(double mx, double my);
 void AddEllipse(double mx, double my);
 double Distans(double mx, double my, double ix, double iy);
-void Delete(int index);//Delete selected element.
+void Delete(int index); //Delete selected element.
 void DrawFrame();
 void DrawEverything();
 
@@ -152,18 +151,18 @@ void Main()
 	registerMouseEvent(MouseEventProcess);
 	registerCharEvent(CharEventProcess);
 
-	allelements.array = (element*)malloc(sizeof(element) * INITSIZE);
+	allelements.array = (element *)malloc(sizeof(element) * INITSIZE);
 	allelements.size = INITSIZE;
 }
 
 void DrawFrame()
 {
-	if (!drawnFrame.isDisplay)//Don't draw if not asked to.
+	if (!drawnFrame.isDisplay) //Don't draw if not asked to.
 		return;
 
 	//char str[2] = { 0,0 };
 	double x, y;
-	int array[9] = { 0,1,2,5,8,7,6,3,0 };//defines the route of the frame drawn
+	int array[9] = {0, 1, 2, 5, 8, 7, 6, 3, 0}; //defines the route of the frame drawn
 	SetPenColor("Black");
 	SetPenSize(1);
 	for (int i = 0; i < 8; i++)
@@ -207,14 +206,14 @@ void DrawEverything()
 		{
 			line *pline = (line *)allelements.array[i].pointer;
 			DisplayLine(pline->x, pline->y, pline->dx, 0);
-			DisplayLine(pline->x+pline->dx, pline->y, 0, pline->dy);
-			DisplayLine(pline->x + pline->dx, pline->y+ pline->dy, -pline->dx, 0);
+			DisplayLine(pline->x + pline->dx, pline->y, 0, pline->dy);
+			DisplayLine(pline->x + pline->dx, pline->y + pline->dy, -pline->dx, 0);
 			DisplayLine(pline->x, pline->y + pline->dy, 0, -pline->dy);
 			break;
 		}
 		case ELLIPSE:
 		{
-			ellipse *pelli = (ellipse*)allelements.array[i].pointer;
+			ellipse *pelli = (ellipse *)allelements.array[i].pointer;
 			DisplayArc(pelli->x, pelli->y, pelli->rx, pelli->ry, 0, 360);
 			break;
 		}
@@ -262,7 +261,7 @@ int CheckArea(double mx, double my)
 		case LINE:
 		{
 			double x, y, dx, dy;
-			line *pline = (line*)allelements.array[i].pointer;
+			line *pline = (line *)allelements.array[i].pointer;
 			x = pline->x;
 			y = pline->y;
 			dx = pline->dx;
@@ -273,8 +272,8 @@ int CheckArea(double mx, double my)
 			double ix, iy;
 			for (double t = 0.0; t <= 1; t += dt)
 			{
-				ix = x + dx*t;
-				iy = y + dy*t;
+				ix = x + dx * t;
+				iy = y + dy * t;
 				double d = Distans(mx, my, ix, iy);
 				if (d <= 0.1)
 				{
@@ -292,19 +291,19 @@ int CheckArea(double mx, double my)
 		case RECTANGLE:
 		{
 			double x, y, dx, dy;
-			line *pline = (line*)allelements.array[i].pointer;
+			line *pline = (line *)allelements.array[i].pointer;
 			x = pline->x;
 			y = pline->y;
 			dx = pline->dx;
 			dy = pline->dy;
 
-			double dtx,dty;
-			dtx = InchesX(1)/fabs(dx);
-			dty = InchesY(1)/fabs(dy);
+			double dtx, dty;
+			dtx = InchesX(1) / fabs(dx);
+			dty = InchesY(1) / fabs(dy);
 			double ix, iy;
 			for (double t = 0.0; t <= 1; t += dtx)
 			{
-				ix = x + t*dx;
+				ix = x + t * dx;
 				iy = y;
 				double d = Distans(mx, my, ix, iy);
 				if (d <= 0.1)
@@ -318,8 +317,8 @@ int CheckArea(double mx, double my)
 					isFirstMove = 1;
 					return 1;
 				}
-				ix = x + t*dx;
-				iy = y+dy;
+				ix = x + t * dx;
+				iy = y + dy;
 				d = Distans(mx, my, ix, iy);
 				if (d <= 0.1)
 				{
@@ -336,7 +335,7 @@ int CheckArea(double mx, double my)
 			for (double t = 0.0; t <= 1; t += dty)
 			{
 				ix = x;
-				iy = y+t*dy;
+				iy = y + t * dy;
 				double d = Distans(mx, my, ix, iy);
 				if (d <= 0.1)
 				{
@@ -349,8 +348,8 @@ int CheckArea(double mx, double my)
 					isFirstMove = 1;
 					return 1;
 				}
-				ix = x+dx;
-				iy = y+t*dy;
+				ix = x + dx;
+				iy = y + t * dy;
 				d = Distans(mx, my, ix, iy);
 				if (d <= 0.1)
 				{
@@ -368,7 +367,7 @@ int CheckArea(double mx, double my)
 		case ELLIPSE:
 		{
 			double x, y, rx, ry;
-			ellipse *pelli = (ellipse*)allelements.array[i].pointer;
+			ellipse *pelli = (ellipse *)allelements.array[i].pointer;
 			x = pelli->x;
 			y = pelli->y;
 			rx = pelli->rx;
@@ -407,7 +406,7 @@ double Distans(double mx, double my, double ix, double iy)
 	double dx, dy;
 	dx = mx - ix;
 	dy = my - iy;
-	re = sqrt(dx*dx + dy * dy);
+	re = sqrt(dx * dx + dy * dy);
 	return re;
 }
 
@@ -484,7 +483,7 @@ void MoveLine(line *pline, double mx, double my)
 }
 void MoveRectangle(line *pline, double mx, double my)
 {
-	MoveLine((line*)elemt.pointer, mx, my);
+	MoveLine((line *)elemt.pointer, mx, my);
 	elemt.id = RECTANGLE;
 	allelements.array[allelements.index - 1].id = RECTANGLE;
 }
@@ -494,13 +493,13 @@ void Move(double mx, double my)
 	switch (elemt.id)
 	{
 	case LINE:
-		MoveLine((line*)elemt.pointer, mx, my);
+		MoveLine((line *)elemt.pointer, mx, my);
 		break;
 	case RECTANGLE:
-		MoveRectangle((line*)elemt.pointer, mx, my);
+		MoveRectangle((line *)elemt.pointer, mx, my);
 		break;
 	case ELLIPSE:
-		MoveEllipse((ellipse*)elemt.pointer, mx, my);
+		MoveEllipse((ellipse *)elemt.pointer, mx, my);
 		break;
 	}
 }
@@ -534,13 +533,13 @@ void Toggle(double mx, double my)
 	switch (elemt.id)
 	{
 	case LINE:
-		ToggleLine((line*)elemt.pointer, mx, my);
+		ToggleLine((line *)elemt.pointer, mx, my);
 		break;
 	case RECTANGLE:
-		ToggleRectangle((line*)elemt.pointer, mx, my);
+		ToggleRectangle((line *)elemt.pointer, mx, my);
 		break;
 	case ELLIPSE:
-		ToggleEllipse((ellipse*)elemt.pointer, mx, my);
+		ToggleEllipse((ellipse *)elemt.pointer, mx, my);
 		break;
 	}
 }
@@ -696,8 +695,8 @@ void ToggleLine(line *pline, double mx, double my)
 		//Toggle lower-right
 	case 2:
 		tx = pline->frame.points[0].x + (mx - omx);
-		ty = pline->frame.points[0].y ;
-		newx = pline->frame.points[8].x ;
+		ty = pline->frame.points[0].y;
+		newx = pline->frame.points[8].x;
 		newy = pline->frame.points[8].y + (my - omy);
 		break;
 
@@ -778,15 +777,14 @@ void ToggleLine(line *pline, double mx, double my)
 }
 void ToggleRectangle(line *ptoggled, double mx, double my)
 {
-	ToggleLine((line*)elemt.pointer, mx, my);
+	ToggleLine((line *)elemt.pointer, mx, my);
 	elemt.id = RECTANGLE;
 	allelements.array[allelements.index - 1].id = RECTANGLE;
 }
 
-
 void Add(double mx, double my)
 {
-	if (isntNew)//If item exists, toggle it.
+	if (isntNew) //If item exists, toggle it.
 	{
 		Toggle(mx, my);
 		return;
@@ -794,8 +792,8 @@ void Add(double mx, double my)
 	if (allelements.index + 5 >= allelements.size)
 	{
 		void *p = allelements.array;
-		allelements.array = (element *)malloc(sizeof(element) *allelements.size * 2);
-		memcpy(allelements.array, p, sizeof(element)*allelements.size);
+		allelements.array = (element *)malloc(sizeof(element) * allelements.size * 2);
+		memcpy(allelements.array, p, sizeof(element) * allelements.size);
 		allelements.size *= 2;
 	}
 	switch (elemt.id)
@@ -816,7 +814,7 @@ void AddEllipse(double mx, double my)
 {
 	isSelect = 1;
 
-	ellipse *pelli;//For the cleanness of code(It's actually unnecessary)
+	ellipse *pelli; //For the cleanness of code(It's actually unnecessary)
 	pelli = (ellipse *)malloc(sizeof(ellipse));
 	elemt.id = ELLIPSE;
 	elemt.pointer = pelli;
@@ -845,7 +843,7 @@ void AddEllipse(double mx, double my)
 			pelli->frame.points[3 * i + j].select = 0;
 		}
 	}
-	pelli->frame.points[8].select = 1;//For toggle
+	pelli->frame.points[8].select = 1; //For toggle
 }
 void AddLine(double mx, double my)
 {
@@ -874,7 +872,7 @@ void AddLine(double mx, double my)
 			pline->frame.points[3 * i + j].select = 0;
 		}
 	}
-	pline->frame.points[8].select = 1;//For toggle
+	pline->frame.points[8].select = 1; //For toggle
 }
 void AddRectangle(double mx, double my)
 {
@@ -886,12 +884,11 @@ void AddRectangle(double mx, double my)
 void Delete(int index)
 {
 	free(allelements.array[index].pointer);
-	memcpy(&allelements.array[index], &allelements.array[index + 1], sizeof(element)*(allelements.index - index - 1));
+	memcpy(&allelements.array[index], &allelements.array[index + 1], sizeof(element) * (allelements.index - index - 1));
 	allelements.index--;
 	for (int i = index; i < allelements.index; i++)
 		allelements.array[i].index--;
 }
-
 
 void KeyboardEventProcess(int key, int event)
 {
@@ -940,7 +937,7 @@ void MouseEventProcess(int x, int y, int key, int event)
 		switch (event)
 		{
 		case BUTTON_DOWN:
-			isDrag = 1;//This flag is to judge whether the left button is down or not
+			isDrag = 1; //This flag is to judge whether the left button is down or not
 			switch (Toolbox)
 			{
 			case DONTDRAW:
@@ -957,7 +954,7 @@ void MouseEventProcess(int x, int y, int key, int event)
 				isDraw = 1;
 				break;
 			}
-			tx = omx = mx;//Track your mouse's location
+			tx = omx = mx; //Track your mouse's location
 			ty = omy = my;
 			//In case you just select something
 			BitBlt(osdc, 0, 0, pixelWidth, pixelHeight, osdc, 0, 0, WHITENESS);
@@ -971,7 +968,7 @@ void MouseEventProcess(int x, int y, int key, int event)
 
 			isDrag = 0;
 			isDraw = 0;
-			isntNew = 0;//So.. it is new now!
+			isntNew = 0; //So.. it is new now!
 			isMove = 0;
 			isToggle = 0;
 			break;
@@ -989,16 +986,16 @@ void MouseEventProcess(int x, int y, int key, int event)
 			if (isDraw)
 			{
 				Add(mx, my);
-				isntNew++;//Whether to simply call the Toggle() function
+				isntNew++; //Whether to simply call the Toggle() function
 			}
-			else if (isToggle)//the order of the following two matters
+			else if (isToggle) //the order of the following two matters
 				Toggle(mx, my);
 			else if (isMove)
 				Move(mx, my);
 
 			DrawEverything();
 		}
-		tx = omx = mx;//Track your mouse's location(Something annoying I have encountered writing the handwriting program)
+		tx = omx = mx; //Track your mouse's location(Something annoying I have encountered writing the handwriting program)
 		ty = omy = my;
 		break;
 	}
