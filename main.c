@@ -122,12 +122,12 @@ int CheckToggle(double mx, double my);//Return whether toggle point is touched. 
 
 void Move(double mx, double my);//Move element around.
 void MoveLine(line *pmoved, double mx, double my);
-void MoveRectangle(rectangle *pmoved, double mx, double my);
+void MoveRectangle(line *pmoved, double mx, double my);
 void MoveEllipse(ellipse *pmoved, double mx, double my);
 
 void Toggle(double mx, double my);//Toggle the size of selected element.
 void ToggleLine(line *ptoggled, double mx, double my);
-void ToggleRectangle(rectangle *ptoggled, double mx, double my);
+void ToggleRectangle(line *ptoggled, double mx, double my);
 void ToggleEllipse(ellipse *ptoggled, double mx, double my);
 
 void Add(double mx, double my);
@@ -154,7 +154,6 @@ void Main()
 
 	allelements.array = (element*)malloc(sizeof(element) * INITSIZE);
 	allelements.size = INITSIZE;
-	allelements.index = 0;
 }
 
 void DrawFrame()
@@ -162,7 +161,7 @@ void DrawFrame()
 	if (!drawnFrame.isDisplay)//Don't draw if not asked to.
 		return;
 
-	char str[2] = { 0,0 };
+	//char str[2] = { 0,0 };
 	double x, y;
 	int array[9] = { 0,1,2,5,8,7,6,3,0 };//defines the route of the frame drawn
 	SetPenColor("Black");
@@ -179,8 +178,8 @@ void DrawFrame()
 		DrawLine(-0.1, 0);
 		DrawLine(0, -0.1);
 		MovePen(x + 0.1, y + 0.1);
-		str[0] = array[i]+'0';
-		DrawTextString(str);
+		//str[0] = array[i]+'0';
+		//DrawTextString(str);
 		MovePen(x, y);
 		DrawLine(drawnFrame.points[array[i + 1]].x - x, drawnFrame.points[array[i + 1]].y - y);
 	}
@@ -200,20 +199,23 @@ void DrawEverything()
 		{
 		case LINE:
 		{
-			line *pline = ((line *)allelements.array[i].pointer);
+			line *pline = (line *)allelements.array[i].pointer;
 			DisplayLine(pline->x, pline->y, pline->dx, pline->dy);
 			break;
 		}
 		case RECTANGLE:
+		{
+			line *pline = (line *)allelements.array[i].pointer;
+			DisplayLine(pline->x, pline->y, pline->dx, 0);
+			DisplayLine(pline->x+pline->dx, pline->y, 0, pline->dy);
+			DisplayLine(pline->x + pline->dx, pline->y+ pline->dy, -pline->dx, 0);
+			DisplayLine(pline->x, pline->y + pline->dy, 0, -pline->dy);
+			break;
+		}
 		case ELLIPSE:
 		{
-			double x, y, rx, ry;
-			ellipse *pelli = ((ellipse*)allelements.array[i].pointer);
-			x = pelli->x;
-			y = pelli->y;
-			rx = pelli->rx;
-			ry = pelli->ry;
-			DisplayArc(x, y, rx, ry, 0, 360);
+			ellipse *pelli = (ellipse*)allelements.array[i].pointer;
+			DisplayArc(pelli->x, pelli->y, pelli->rx, pelli->ry, 0, 360);
 			break;
 		}
 		}
@@ -267,7 +269,7 @@ int CheckArea(double mx, double my)
 			dy = pline->dy;
 
 			double dt;
-			dt = (dx > dy ? InchesX(1) : InchesY(1)) / (dx > dy ? dx : dy);
+			dt = (fabs(dx) > fabs(dy) ? InchesX(1) : InchesY(1)) / (fabs(dx) > fabs(dy) ? fabs(dx) : fabs(dy));
 			double ix, iy;
 			for (double t = 0.0; t <= 1; t += dt)
 			{
@@ -288,6 +290,81 @@ int CheckArea(double mx, double my)
 			}
 		}
 		case RECTANGLE:
+		{
+			double x, y, dx, dy;
+			line *pline = (line*)allelements.array[i].pointer;
+			x = pline->x;
+			y = pline->y;
+			dx = pline->dx;
+			dy = pline->dy;
+
+			double dtx,dty;
+			dtx = InchesX(1)/fabs(dx);
+			dty = InchesY(1)/fabs(dy);
+			double ix, iy;
+			for (double t = 0.0; t <= 1; t += dtx)
+			{
+				ix = x + t*dx;
+				iy = y;
+				double d = Distans(mx, my, ix, iy);
+				if (d <= 0.1)
+				{
+					isSelect = 1;
+					isMove = 1;
+					elemt.id = RECTANGLE;
+					elemt.index = i;
+					elemt.pointer = allelements.array[i].pointer;
+					pline->frame.isDisplay = 1;
+					isFirstMove = 1;
+					return 1;
+				}
+				ix = x + t*dx;
+				iy = y+dy;
+				d = Distans(mx, my, ix, iy);
+				if (d <= 0.1)
+				{
+					isSelect = 1;
+					isMove = 1;
+					elemt.id = RECTANGLE;
+					elemt.index = i;
+					elemt.pointer = allelements.array[i].pointer;
+					pline->frame.isDisplay = 1;
+					isFirstMove = 1;
+					return 1;
+				}
+			}
+			for (double t = 0.0; t <= 1; t += dty)
+			{
+				ix = x;
+				iy = y+t*dy;
+				double d = Distans(mx, my, ix, iy);
+				if (d <= 0.1)
+				{
+					isSelect = 1;
+					isMove = 1;
+					elemt.id = RECTANGLE;
+					elemt.index = i;
+					elemt.pointer = allelements.array[i].pointer;
+					pline->frame.isDisplay = 1;
+					isFirstMove = 1;
+					return 1;
+				}
+				ix = x+dx;
+				iy = y+t*dy;
+				d = Distans(mx, my, ix, iy);
+				if (d <= 0.1)
+				{
+					isSelect = 1;
+					isMove = 1;
+					elemt.id = RECTANGLE;
+					elemt.index = i;
+					elemt.pointer = allelements.array[i].pointer;
+					pline->frame.isDisplay = 1;
+					isFirstMove = 1;
+					return 1;
+				}
+			}
+		}
 		case ELLIPSE:
 		{
 			double x, y, rx, ry;
@@ -366,9 +443,11 @@ int CheckToggle(double mx, double my)
 				switch (elemt.id)
 				{
 				case LINE:
-					((ellipse *)elemt.pointer)->frame.points[3 * i + j].select = 1;
+					((line *)elemt.pointer)->frame.points[3 * i + j].select = 1;
 					break;
 				case RECTANGLE:
+					((line *)elemt.pointer)->frame.points[3 * i + j].select = 1;
+					break;
 				case ELLIPSE:
 					((ellipse *)elemt.pointer)->frame.points[3 * i + j].select = 1;
 					break;
@@ -403,9 +482,11 @@ void MoveLine(line *pline, double mx, double my)
 	if (isMove)
 		((line *)elemt.pointer)->frame.isDisplay = 1;
 }
-void MoveRectangle(rectangle *pmoved, double mx, double my)
+void MoveRectangle(line *pline, double mx, double my)
 {
-
+	MoveLine((line*)elemt.pointer, mx, my);
+	elemt.id = RECTANGLE;
+	allelements.array[allelements.index - 1].id = RECTANGLE;
 }
 
 void Move(double mx, double my)
@@ -416,7 +497,7 @@ void Move(double mx, double my)
 		MoveLine((line*)elemt.pointer, mx, my);
 		break;
 	case RECTANGLE:
-		MoveRectangle((rectangle*)elemt.pointer, mx, my);
+		MoveRectangle((line*)elemt.pointer, mx, my);
 		break;
 	case ELLIPSE:
 		MoveEllipse((ellipse*)elemt.pointer, mx, my);
@@ -456,7 +537,7 @@ void Toggle(double mx, double my)
 		ToggleLine((line*)elemt.pointer, mx, my);
 		break;
 	case RECTANGLE:
-		ToggleRectangle((rectangle*)elemt.pointer, mx, my);
+		ToggleRectangle((line*)elemt.pointer, mx, my);
 		break;
 	case ELLIPSE:
 		ToggleEllipse((ellipse*)elemt.pointer, mx, my);
@@ -695,9 +776,11 @@ void ToggleLine(line *pline, double mx, double my)
 		}
 	}
 }
-void ToggleRectangle(rectangle *ptoggled, double mx, double my)
+void ToggleRectangle(line *ptoggled, double mx, double my)
 {
-
+	ToggleLine((line*)elemt.pointer, mx, my);
+	elemt.id = RECTANGLE;
+	allelements.array[allelements.index - 1].id = RECTANGLE;
 }
 
 
@@ -795,7 +878,9 @@ void AddLine(double mx, double my)
 }
 void AddRectangle(double mx, double my)
 {
-
+	AddLine(mx, my);
+	elemt.id = RECTANGLE;
+	allelements.array[allelements.index - 1].id = RECTANGLE;
 }
 
 void Delete(int index)
