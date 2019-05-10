@@ -1,11 +1,5 @@
 # CAD
 
-## Please~~!!
-
-### Add support for text, line, rectangle.
-
-### With all those previous bugs solved for ellipse, it should be easy.
-
 
 
 ## Property
@@ -22,6 +16,20 @@
 2. Move them like in PS.
 3. Toggle them like in PS.
 4. Text frame(to be implemented)
+
+
+
+## Update
+
+1. Line done
+
+2. Rectangle done
+
+3. It suddenly occurs to me that those three things were using the same structure.
+
+   Is it possible to toggle the codes to make it shorter?
+
+4. `Delete` key is also supported now.
 
 
 
