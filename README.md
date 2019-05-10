@@ -27,6 +27,16 @@
 
 ## Update
 
+1. CAD rebase finished
+   - Remove `frame`
+   - Remove `slect`
+   - Perfect `Delete()`
+   - Add `Toolbox`
+
+
+
+## Update
+
 1. Now you can draw a ellipse(or many ellipse) like in any other graphic processing software.
 2. Movement also supported for ellipse.
 3. Toggling is supported as well.
@@ -56,4 +66,12 @@ The actual source **IS COMPLETELY A MESS**.
 Nothing more to say.
 
 Feeling dead already.
+
+### Well...
+
+After two hours, the logic is becoming clearer.
+
+I've noticed that you should never just change things. You should have a plan.
+
+Coding a project is like building a kingdom. hhhh.
 
