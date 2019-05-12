@@ -46,8 +46,8 @@
  * DefaultFont     -- Font that serves as the "Default" font
  */
 
-#define DesiredWidth       16.0
-#define DesiredHeight      9.0
+#define DesiredWidth       24.0
+#define DesiredHeight      14.0
 #define DefaultSize       12
 #define MaxTitle          75
 #define MaxFontName       50
@@ -945,8 +945,8 @@ static void InitDrawingTools(void)
 
     nFonts = 0;
     previousColor = 0;
-    eraseColor = RGB(0,0,0);
-	drawColor = RGB(230, 230, 230);
+	drawColor = RGB(0,0,0);
+	eraseColor = RGB(255, 255, 255);
     drawPen = (HPEN) CreatePen(PS_SOLID, penSize, drawColor);
     erasePen = (HPEN) CreatePen(PS_SOLID, penSize, eraseColor);
     nullPen = (HPEN) GetStockObject(NULL_PEN);
@@ -1402,8 +1402,12 @@ void DisplayText(double x, double y, string text)
     RECT r;
 
     PrepareToDraw();
-    SetTextBB(&r, x, y, text);
-    InvalidateRect(graphicsWindow, &r, 0);
+        //SetTextBB(&r, x, y, text);
+	r.left = 0;
+	r.top = 0;
+	r.right = pixelWidth;
+	r.bottom = pixelHeight;
+    InvalidateRect(graphicsWindow, &r, FALSE);
     SetBkMode(osdc, TRANSPARENT);
     TextOut(osdc, ScaleX(x), ScaleY(y) - fontTable[currentFont].ascent, text, strlen(text));
     SetBkMode(osdc, OPAQUE);
@@ -1662,7 +1666,7 @@ void DisplayPolygon(void)
         Error("Internal error: Can't load brush");
     }
     oldBrush = (HBRUSH) SelectObject(osdc, brush);
-    Polyline(osdc, polygonPoints, nPolygonPoints);
+    Polygon(osdc, polygonPoints, nPolygonPoints);
     (void) SelectObject(osdc, oldPen);
     if (oldBrush != NULL) (void) SelectObject(osdc, oldBrush);
     FreeBlock(polygonPoints);
