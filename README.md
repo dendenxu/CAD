@@ -15,7 +15,28 @@
 1. Draw a line, rectangle or ellipse on the screen.
 2. Move them like in PS.
 3. Toggle them like in PS.
-4. Text frame(to be implemented)
+4. Text frame
+
+
+
+## Update
+
+1. Text done
+   - To draw or move a text frame along with its text, just hit the `f4` key and do whatever you want as if it were an ellipse. I'll list what to do.
+     - Hit the `f4` key on your keyboard to tell the program that you selected the `textframe` tool from the toolbox.
+     - Press `left button` on your mouse within the graphic window area.
+     - Move your mouse with `left button` down. Now you can see an line appearing on your screen.
+     - Release `left button`, the line stays on your screen.
+     - Then you're supposed to see twinkling cursor at the up-left corner of the `textframe`.
+     - Now type what you want to see on the screen inside the `textframe`. Note that `Backspace`, `Delete`, `Left`, `Right`, `Enter` keys are supported while editing your text.
+     - The text-frame supports line buffer, which means once you've hit the `enter` key, the text of the previous line cannot be selected from now on.(Unless you're already at the bottom of the text frame, where `enter` don't submit the line being edited.)
+     - Please avoid Chinese word. If you enter Chinese, scrambled code may appear, or `Song-Ti` Character may appear but cursor behaves badly. In all, don't try.
+     - **REMEMBER TO HIT `ESC` WHEN YOU'RE DONE WITH THIS TEXT-FRAME**. Or... bad things may happen. Or maybe nothing happens.
+     - Hit `f5` to select the `hand` tool.
+     - You can `left click` on the frame of the text you've typed to select it.(A `toggle box` should appear. Bigger than that of a rectangle or ellipse or line.)
+     - Or `move` it around within the window. (A `toggle box` should appear. Bigger than that of a rectangle or ellipse or line.)
+     - Want to close the window? Hit `Alt + f4`.
+2. Bad problems when deleting the last object fixed.
 
 
 
