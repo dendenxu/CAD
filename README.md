@@ -54,18 +54,7 @@
      - Or `move` it around within the window. (A `toggle box` should appear.)
      - With your `toggle box ` on the screen, toggle the line selected on the screen.
      - Want to close the window? Hit `Alt + f4`.
-   - To draw, move or toggle a rectangle, just hit the `f1` key and do whatever you want as if it were an line. I'll list what to do.
-
-     - Hit the `f2` key on your keyboard to tell the program that you selected the `rectangle` tool from the toolbox.
-     - Press `left button` on your mouse within the graphic window area.
-     - Move your mouse with `left button` down. Now you can see an rectangle appearing on your screen.
-     - Release `left button`, the rectangle stays on your screen.
-     - Hit `f5` to select the `hand` tool.
-     - You can `left click` on an rectangle you've drawn to select it.(A `toggle box` should appear.)
-     - Or `move` it around within the window. (A `toggle box` should appear.)
-     - With your `toggle box ` on the screen, toggle the rectangle selected on the screen.
-     - Want to close the window? Hit `Alt + f4`.
-
+   
 2. Rectangle done
 
    - To draw, move or toggle a rectangle, just hit the `f1` key and do whatever you want as if it were an line. I'll list what to do.
