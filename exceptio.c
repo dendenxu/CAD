@@ -57,35 +57,35 @@ static context_block *FindHandler(exception *e);
  * within the exception handler may fail.
  */
 
-//void RaiseException(exception *e, string name, void *value)
-//{
-//    context_block *cb;
-//    char errbuf[MaxUnhandledMessage + 1];
-//    string errmsg;
-//    int errlen;
-//
-//    cb = FindHandler(e);
-//    if (cb == NULL) {
-//        sprintf(errbuf, "Unhandled exception (%.30s)", name);
-//        errlen = strlen(errbuf);
-//        if (_acb == NULL) {
-//            errmsg = malloc(errlen + 1);
-//        } else {
-//            errmsg = _acb->allocMethod(errlen + 1);
-//        }
-//        if (errmsg == NULL) {
-//            errmsg = "Unhandled exception: unknown";
-//        } else {
-//            strcpy(errmsg, errbuf);
-//        }
-//        Error(errmsg);
-//    }
-//    exceptionStack = cb;
-//    cb->id = e;
-//    cb->value = value;
-//    cb->name = name;
-//    longjmp(cb->jmp, ES_Exception);
-//}
+void RaiseException(exception *e, string name, void *value)
+{
+    context_block *cb;
+    char errbuf[MaxUnhandledMessage + 1];
+    string errmsg;
+    int errlen;
+
+    cb = FindHandler(e);
+    if (cb == NULL) {
+        sprintf(errbuf, "Unhandled exception (%.30s)", name);
+        errlen = strlen(errbuf);
+        if (_acb == NULL) {
+            errmsg = malloc(errlen + 1);
+        } else {
+            errmsg = _acb->allocMethod(errlen + 1);
+        }
+        if (errmsg == NULL) {
+            errmsg = "Unhandled exception: unknown";
+        } else {
+            strcpy(errmsg, errbuf);
+        }
+        Error(errmsg);
+    }
+    exceptionStack = cb;
+    cb->id = e;
+    cb->value = value;
+    cb->name = name;
+    longjmp(cb->jmp, ES_Exception);
+}
 
 /*
  * Function: HandlerExists
